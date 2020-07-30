@@ -19,7 +19,7 @@ setup(
     url='https://github.com/RogerSelwyn/skyq_hub',
     license='MIT',
     packages=find_namespace_packages(),
-    install_requires=['aiohttp==3.6.2'],
+    install_requires=['aiohttp>=3.6.2'],
     keywords='SKYQ hub',
     include_package_data=True,
     zip_safe=False,
