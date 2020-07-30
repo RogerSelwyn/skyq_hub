@@ -42,7 +42,7 @@ class SkyQHub:
                         self._log_message(
                             "Connection restored to router",
                             unset_error=True,
-                            level=ERROR,
+                            level=INFO,
                             error_type=CONNECTION_ERROR,
                         )
                     responsedata = await response.text()
@@ -51,7 +51,7 @@ class SkyQHub:
                         self._log_message(
                             "Response data from Sky Hub corrected",
                             unset_error=True,
-                            level=ERROR,
+                            level=INFO,
                             error_type=DATA_ERROR,
                         )
                     return parseddata
@@ -83,27 +83,26 @@ class SkyQHub:
     def _log_message(
         self, log_message, unset_error=False, level=ERROR, error_type=None
     ):
+        if error_type == CONNECTION_ERROR:
+            if self._connection_failed and not unset_error:
+                _LOGGER.debug(log_message)
+                return
+            if unset_error:
+                self._connection_failed = False
+            else:
+                self._connection_failed = True
+        if error_type == DATA_ERROR:
+            if self._dataparse_failed and not unset_error:
+                _LOGGER.debug(log_message)
+                return
+            if unset_error:
+                self._dataparse_failed = False
+            else:
+                self._dataparse_failed = True
+        if level == ERROR:
+            _LOGGER.error(log_message)
         if level == INFO:
             _LOGGER.info(log_message)
-            return
-        if level == ERROR:
-            if error_type == CONNECTION_ERROR:
-                if self._connection_failed and not unset_error:
-                    _LOGGER.debug(log_message)
-                    return
-                if unset_error:
-                    self._connection_failed = False
-                else:
-                    self._connection_failed = True
-            if error_type == DATA_ERROR:
-                if self._dataparse_failed and not unset_error:
-                    _LOGGER.debug(log_message)
-                    return
-                if unset_error:
-                    self._dataparse_failed = False
-                else:
-                    self._dataparse_failed = True
-            _LOGGER.error(log_message)
         return
 
 
