@@ -38,11 +38,12 @@ devices = await skyhub.async_get_skyhub_data()
 Will return an object such as below:
 
 ```
-{
-   '68:xx:7b:cc:xx:5c':'UNKNOWN',
-   '70:xx:57:a3:xx:f0':'UNKNOWN',
-   'e4:xx:6e:44:xx:7d':'Private',
-   '20:xx:ed:c5:xx:72':'SKY+HD',
-   '18:xx:30:bf:xx:e6':'09AA0xxxxxx02WV'
-}
+[
+   {'mac': '68:xx:7b:cc:xx:5c', 'name': 'UNKNOWN'},
+   {'mac': '70:xx:57:a3:xx:f0', 'name': 'UNKNOWN'},
+   {'mac': 'e4:xx:6e:44:xx:7d', 'name': 'Private'},
+   {'mac': '20:xx:ed:c5:xx:72', 'name': 'SKY+HD'},
+   {'mac': '18:xx:30:bf:xx:e6', 'name': '09AA0xxxxxx02WV'},
+   ...
+]
 ```
