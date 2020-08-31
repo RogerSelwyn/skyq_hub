@@ -2,10 +2,11 @@
 import asyncio
 import logging
 import re
+from dataclasses import dataclass, field
 
 import aiohttp
 
-from .const import CONNECTION_ERROR, DATA_ERROR, MAC_REGEX
+from .const import CONNECTION_ERROR, DATA_ERROR, MAC_REGEX  # , test_response
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -46,6 +47,7 @@ class SkyQHub:
                             error_type=CONNECTION_ERROR,
                         )
                     responsedata = await response.text()
+                    # responsedata = test_response
                     parseddata = _parse_skyhub_response(responsedata)
                     if self._dataparse_failed:
                         self._log_message(
@@ -117,11 +119,20 @@ def _parse_skyhub_response(data_str):
 
     dev = [patt1.split(",") for patt1 in patt.split("<lf>")]
 
-    devices = {}
+    devices = []
     for dvc in dev:
         if MAC_REGEX.match(dvc[1]):
-            devices[dvc[1]] = dvc[0]
+            devices.append(_Device(dvc[1], dvc[0]))
         else:
             raise RuntimeError(f"Error: MAC address {dvc[1]} not in correct format.")
 
     return devices
+
+
+@dataclass
+class _Device:
+    mac: str = field(init=True, repr=True, compare=True)
+    name: str = field(init=True, repr=True, compare=True)
+
+    def asdict(self):
+        return {"mac": self.mac}
