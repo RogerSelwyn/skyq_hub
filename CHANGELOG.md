@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.3 (06/09/2020)
+### Fixes
+- [Remove 'tests' & 'manage' from distribution package](https://github.com/RogerSelwyn/skyq_hub/commit/cdaf7526dbf8acbaa53227002ec2628d8645f19c) - @RogerSelwyn
+
+### Maintenance
+- [Update README.md](https://github.com/RogerSelwyn/skyq_hub/commit/6e508bce062095f97c3aa986cf04e3dbf37f4670) - @RogerSelwyn
+
 ## v0.1.2 (31/08/2020)
 ### Maintenance
 - [Unconstrain pygithub](https://github.com/RogerSelwyn/skyq_hub/commit/9c45e6d6e2ad80f33d6afbe54dd6a9c3450eaa4b) - @RogerSelwyn
