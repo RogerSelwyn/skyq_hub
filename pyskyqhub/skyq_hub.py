@@ -6,8 +6,7 @@ from dataclasses import dataclass, field
 
 import aiohttp
 
-from .const import MAC_REGEX  # , test_response
-from .const import CONNECTION_ERROR, DATA_ERROR
+from .const import CONNECTION_ERROR, DATA_ERROR, MAC_REGEX  # , TEST_RESPONSE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -50,7 +49,7 @@ class SkyQHub:
                             error_type=CONNECTION_ERROR,
                         )
                     responsedata = await response.text()
-                    # responsedata = test_response
+                    # responsedata = TEST_RESPONSE
                     parseddata = await self._async_parse_skyhub_response(responsedata)
                     if self._dataparse_failed:
                         self._log_message(
@@ -77,7 +76,7 @@ class SkyQHub:
             return
         except (OSError, RuntimeError) as err:
             if not self.success_init:
-                message = f"Error parsing data at initialisation for {self.host}, is this a Sky Router?"
+                message = f"Error parsing data at startup for {self.host}, is this a Sky Router?"
             else:
                 message = f"Invalid response from Sky Hub: {err}"
             self._log_message(
@@ -91,22 +90,29 @@ class SkyQHub:
         """Parse the Sky Hub data format."""
         pattmatch = re.search("attach_dev = '(.*)'", data_str)
         if pattmatch is None:
-            raise OSError("Error: Impossible to fetch data from Sky Hub. Try to reboot the router.")
+            raise OSError(
+                "Error: Impossible to fetch data from Sky Hub. Try to reboot the router."
+            )
         patt = pattmatch.group(1)
 
         dev = [patt1.split(",") for patt1 in patt.split("<lf>")]
 
         devices = []
-        for i, dvc in enumerate(dev):
+        for dvc in dev:
             if not MAC_REGEX.match(dvc[1]):
-                raise RuntimeError(f"Error: MAC address {dvc[1]} not in correct format.")
+                raise RuntimeError(
+                    f"Error: MAC address {dvc[1]} not in correct format."
+                )
 
             mac = dvc[1]
             name = dvc[0]
-            devices.append(_Device(mac, name))
+            connection = dvc[2]
+            devices.append(_Device(mac, name, connection))
         return devices
 
-    def _log_message(self, log_message, unset_error=False, level=ERROR, error_type=None):
+    def _log_message(
+        self, log_message, unset_error=False, level=ERROR, error_type=None
+    ):
         if error_type == CONNECTION_ERROR:
             if self._connection_failed and not unset_error:
                 _LOGGER.debug(log_message)
@@ -128,6 +134,8 @@ class SkyQHub:
 class _Device:
     mac: str = field(init=True, repr=True, compare=True)
     name: str = field(init=True, repr=True, compare=True)
+    connection: str = field(init=True, repr=True, compare=True)
 
     def asdict(self):
+        """Convert to dictionary."""
         return {"mac": self.mac}
