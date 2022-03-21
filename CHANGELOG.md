@@ -1,6 +1,13 @@
 # Changelog
 
-## v0.1.5 (2022/03/21)
+## v0.1.6 (2022/03/21)
+### Enhancements
+- [Return connection type in dictionary](https://github.com/RogerSelwyn/skyq_hub/commit/d1f87a5c67335474e42f4c93e647891bb80b26cb) - @RogerSelwyn
+
+### Maintenance
+- [Bump to 0.1.6](https://github.com/RogerSelwyn/skyq_hub/commit/764a7ce4b27a8e0bc9045d4b383e8817b7598a14) - @RogerSelwyn
+
+## v0.1.5 (2022/03/19)
 ### Enhancements
 - [Add connection type information](https://github.com/RogerSelwyn/skyq_hub/commit/13a33fc04cd3541d0909e3fbb25289d0d51590b2) - @RogerSelwyn
 
