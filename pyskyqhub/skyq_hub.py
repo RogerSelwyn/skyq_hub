@@ -138,4 +138,4 @@ class _Device:
 
     def asdict(self):
         """Convert to dictionary."""
-        return {"mac": self.mac}
+        return {"mac": self.mac, "connection": self.connection}
