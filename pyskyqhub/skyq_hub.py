@@ -24,14 +24,15 @@ class SkyQHub:
         self.websession = websession
         self.host = host
         self.url = f"http://{self.host}/"
+        self.ssid = None
         self._connection_failed = False
         self._dataparse_failed = False
         self.success_init = False
 
     async def async_connect(self):
         """Test the router is accessible."""
-        data = await self.async_get_skyhub_data()
-        self.success_init = data is not None
+        devices = await self.async_get_skyhub_data()
+        self.success_init = devices is not None
 
     async def async_get_skyhub_data(self):
         """Retrieve data from Sky Hub and return parsed result."""
@@ -50,7 +51,7 @@ class SkyQHub:
                         )
                     responsedata = await response.text()
                     # responsedata = TEST_RESPONSE
-                    parseddata = await self._async_parse_skyhub_response(responsedata)
+                    parseddata, ssid = _parse_skyhub_response(responsedata)
                     if self._dataparse_failed:
                         self._log_message(
                             "Response data from Sky Hub corrected",
@@ -58,6 +59,8 @@ class SkyQHub:
                             level=INFO,
                             error_type=DATA_ERROR,
                         )
+                    else:
+                        self.ssid = ssid
                     return parseddata
 
         except asyncio.TimeoutError:
@@ -75,40 +78,18 @@ class SkyQHub:
             )
             return
         except (OSError, RuntimeError) as err:
-            if not self.success_init:
-                message = f"Error parsing data at startup for {self.host}, is this a Sky Router?"
-            else:
-                message = f"Invalid response from Sky Hub: {err}"
+            message = (
+                f"Invalid response from Sky Hub: {err}"
+                if self.success_init
+                else f"Error parsing data at startup for {self.host}, is this a Sky Router?"
+            )
+
             self._log_message(
                 message,
                 level=ERROR,
                 error_type=DATA_ERROR,
             )
             return
-
-    async def _async_parse_skyhub_response(self, data_str):
-        """Parse the Sky Hub data format."""
-        pattmatch = re.search("attach_dev = '(.*)'", data_str)
-        if pattmatch is None:
-            raise OSError(
-                "Error: Impossible to fetch data from Sky Hub. Try to reboot the router."
-            )
-        patt = pattmatch.group(1)
-
-        dev = [patt1.split(",") for patt1 in patt.split("<lf>")]
-
-        devices = []
-        for dvc in dev:
-            if not MAC_REGEX.match(dvc[1]):
-                raise RuntimeError(
-                    f"Error: MAC address {dvc[1]} not in correct format."
-                )
-
-            mac = dvc[1]
-            name = dvc[0]
-            connection = dvc[2]
-            devices.append(_Device(mac, name, connection))
-        return devices
 
     def _log_message(
         self, log_message, unset_error=False, level=ERROR, error_type=None
@@ -139,3 +120,27 @@ class _Device:
     def asdict(self):
         """Convert to dictionary."""
         return {"mac": self.mac, "connection": self.connection}
+
+
+def _parse_skyhub_response(data_str):
+    """Parse the Sky Hub data format."""
+    pattmatch = re.search("attach_dev = '(.*)'", data_str)
+    if pattmatch is None:
+        raise OSError(
+            "Error: Impossible to fetch data from Sky Hub. Try to reboot the router."
+        )
+    patt = pattmatch.group(1)
+
+    dev = [patt1.split(",") for patt1 in patt.split("<lf>")]
+
+    devices = []
+    for dvc in dev:
+        if not MAC_REGEX.match(dvc[1]):
+            raise RuntimeError(f"Error: MAC address {dvc[1]} not in correct format.")
+
+        mac = dvc[1]
+        name = dvc[0]
+        connection = dvc[2]
+        devices.append(_Device(mac, name, connection))
+    ssidmatch = re.search("sky_WirelessAllSSIDs = '(.*)'", data_str)
+    return devices, ssidmatch.group(1)
