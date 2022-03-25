@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.7 (2022/03/25)
+### Enhancements
+- [Retrieve SSID](https://github.com/RogerSelwyn/skyq_hub/commit/4864c37db2f167e7a4fb026024becbf30299e3a6) - @RogerSelwyn
+### Maintenance
+- [Update CHANGELOG.md](https://github.com/RogerSelwyn/skyq_hub/commit/25cdd4a7910fe0bcc9000c53007e92cff02c6ee1) - @RogerSelwyn
+
 ## v0.1.6 (2022/03/21)
 ### Enhancements
 - [Return connection type in dictionary](https://github.com/RogerSelwyn/skyq_hub/commit/d1f87a5c67335474e42f4c93e647891bb80b26cb) - @RogerSelwyn
