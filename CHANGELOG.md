@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.9 (2022/03/28)
+### Enhancements
+- [Add check for router available](https://github.com/RogerSelwyn/skyq_hub/commit/4bf2e9d7151525f618b8416b8c57183f617a719c) - @RogerSelwyn
+
+### Maintenance
+- [Bump to 0.1.9](https://github.com/RogerSelwyn/skyq_hub/commit/0005cde484d65a7582146fd9024b9f7016835670) - @RogerSelwyn
+
 ## v0.1.8 (2022/03/28)
 ### Enhancements
 - [Return config values as properties](https://github.com/RogerSelwyn/skyq_hub/commit/6bda1dd8ae49e3871bc2ad8ab294d3fe855728fc) - @RogerSelwyn
