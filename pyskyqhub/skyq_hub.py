@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 import aiohttp
 
-from .const import CONNECTION_ERROR, DATA_ERROR, MAC_REGEX  # , TEST_RESPONSE
+from .const import CONNECTION_ERROR, DATA_ERROR, MAC_REGEX, TEST_RESPONSE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,25 +21,52 @@ class SkyQHub:
 
     def __init__(self, websession: aiohttp.ClientSession, host: str):
         """Initialize the hub."""
-        self.websession = websession
-        self.host = host
-        self.url = f"http://{self.host}/"
-        self.ssid = None
+        self._websession = websession
+        self._host = host
+        self._url = f"http://{self._host}/"
+        self._ssid = None
+        self._mac = None
+        self._ipaddr = None
         self._connection_failed = False
         self._dataparse_failed = False
-        self.success_init = False
+        self._success_init = False
+
+    @property
+    def wan_ip(self):
+        """Return wan ip address."""
+        return self._ipaddr
+
+    @property
+    def wan_mac(self):
+        """Return wan mac address."""
+        return self._mac
+
+    @property
+    def ssid(self):
+        """Return ssid."""
+        return self._ssid
+
+    @property
+    def success_init(self):
+        """Return sucess_status."""
+        return self._success_init
+
+    @property
+    def url(self):
+        """Return host url."""
+        return self._url
 
     async def async_connect(self):
         """Test the router is accessible."""
         devices = await self.async_get_skyhub_data()
-        self.success_init = devices is not None
+        self._success_init = devices is not None
 
     async def async_get_skyhub_data(self):
         """Retrieve data from Sky Hub and return parsed result."""
         parseddata = None
         try:
-            async with getattr(self.websession, "get")(
-                self.url,
+            async with getattr(self._websession, "get")(
+                self._url,
             ) as response:
                 if response.status == HTTP_OK:
                     if self._connection_failed:
@@ -50,8 +77,8 @@ class SkyQHub:
                             error_type=CONNECTION_ERROR,
                         )
                     responsedata = await response.text()
-                    # responsedata = TEST_RESPONSE
-                    parseddata, ssid = _parse_skyhub_response(responsedata)
+                    responsedata = TEST_RESPONSE
+                    parseddata, ssid, ipaddr, mac = _parse_skyhub_response(responsedata)
                     if self._dataparse_failed:
                         self._log_message(
                             "Response data from Sky Hub corrected",
@@ -60,7 +87,9 @@ class SkyQHub:
                             error_type=DATA_ERROR,
                         )
                     else:
-                        self.ssid = ssid
+                        self._ssid = ssid
+                        self._mac = mac
+                        self._ipaddr = ipaddr
                     return parseddata
 
         except asyncio.TimeoutError:
@@ -81,7 +110,7 @@ class SkyQHub:
             message = (
                 f"Invalid response from Sky Hub: {err}"
                 if self.success_init
-                else f"Error parsing data at startup for {self.host}, is this a Sky Router?"
+                else f"Error parsing data at startup for {self._host}, is this a Sky Router?"
             )
 
             self._log_message(
@@ -142,5 +171,8 @@ def _parse_skyhub_response(data_str):
         name = dvc[0]
         connection = dvc[2]
         devices.append(_Device(mac, name, connection))
-    ssidmatch = re.search("sky_WirelessAllSSIDs = '(.*)'", data_str)
-    return devices, ssidmatch.group(1)
+    ssid = re.search("sky_WirelessAllSSIDs = '(.*)'", data_str).group(1)
+    wanmatch = re.search("wanDslLinkConfig = '(.*)'", data_str).group(1).split("_")
+    ipaddr = wanmatch[5]
+    mac = wanmatch[6]
+    return devices, ssid, ipaddr, mac
