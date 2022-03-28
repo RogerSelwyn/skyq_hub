@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 import aiohttp
 
-from .const import CONNECTION_ERROR, DATA_ERROR, MAC_REGEX, TEST_RESPONSE
+from .const import CONNECTION_ERROR, DATA_ERROR, MAC_REGEX  # , TEST_RESPONSE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,16 +30,12 @@ class SkyQHub:
         self._connection_failed = False
         self._dataparse_failed = False
         self._success_init = False
+        self._available = False
 
     @property
-    def wan_ip(self):
-        """Return wan ip address."""
-        return self._ipaddr
-
-    @property
-    def wan_mac(self):
-        """Return wan mac address."""
-        return self._mac
+    def available(self):
+        """Return ssid."""
+        return self._available
 
     @property
     def ssid(self):
@@ -50,6 +46,16 @@ class SkyQHub:
     def success_init(self):
         """Return sucess_status."""
         return self._success_init
+
+    @property
+    def wan_ip(self):
+        """Return wan ip address."""
+        return self._ipaddr
+
+    @property
+    def wan_mac(self):
+        """Return wan mac address."""
+        return self._mac
 
     @property
     def url(self):
@@ -64,11 +70,13 @@ class SkyQHub:
     async def async_get_skyhub_data(self):
         """Retrieve data from Sky Hub and return parsed result."""
         parseddata = None
+        self._available = False
         try:
             async with getattr(self._websession, "get")(
                 self._url,
             ) as response:
                 if response.status == HTTP_OK:
+                    self._available = True
                     if self._connection_failed:
                         self._log_message(
                             "Connection restored to router",
@@ -77,7 +85,7 @@ class SkyQHub:
                             error_type=CONNECTION_ERROR,
                         )
                     responsedata = await response.text()
-                    responsedata = TEST_RESPONSE
+                    # responsedata = TEST_RESPONSE
                     parseddata, ssid, ipaddr, mac = _parse_skyhub_response(responsedata)
                     if self._dataparse_failed:
                         self._log_message(
