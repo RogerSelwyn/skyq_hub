@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.8 (2022/03/28)
+### Enhancements
+- [Return config values as properties](https://github.com/RogerSelwyn/skyq_hub/commit/6bda1dd8ae49e3871bc2ad8ab294d3fe855728fc) - @RogerSelwyn
+
+### Maintenance
+- [Bump to 0.1.8](https://github.com/RogerSelwyn/skyq_hub/commit/fcf852863644a0b2b448a945b528723808e9422b) - @RogerSelwyn
+
 ## v0.1.7 (2022/03/25)
 ### Enhancements
 - [Retrieve SSID](https://github.com/RogerSelwyn/skyq_hub/commit/4864c37db2f167e7a4fb026024becbf30299e3a6) - @RogerSelwyn
