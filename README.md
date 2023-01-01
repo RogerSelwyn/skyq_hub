@@ -1,6 +1,6 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/rogerselwyn/skyq_hub/badge)](https://www.codefactor.io/repository/github/rogerselwyn/skyq_hub)
 
-[![maintained](https://img.shields.io/maintenance/yes/2022.svg)](#)
+[![maintained](https://img.shields.io/maintenance/yes/2023.svg)](#)
 [![maintainer](https://img.shields.io/badge/maintainer-%20%40RogerSelwyn-blue.svg)](https://github.com/RogerSelwyn)
 
 # pyskyqhub
