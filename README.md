@@ -53,5 +53,5 @@ Will return an object such as below:
 The following properties are provided from the component:
 * available - Whether the router was accessible and providing valid data.
 * ssid - The Wifi SSID provided by the router.
-* wan_ip - The extrenal IP address of the router.
+* wan_ip - The external IP address of the router.
 * wan_mac - The external mac of the router.
